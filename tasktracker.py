@@ -44,10 +44,84 @@ def markcompleted():
         tkinter.messagebox.showwarning(title="Warning!", message="Please select a task to mark as completed")
 
 
+def edittask():
+    selected = listbox_task.curselection()
+    if selected:
+        current_text = listbox_task.get(selected[0])
+        def save():
+            new_text = entry_edit.get(1.0, "end-1c")
+            listbox_task.delete(selected[0])
+            listbox_task.insert(selected[0], new_text)
+            root_edit.destroy()
+        root_edit = Tk()
+        root_edit.title("Edit task")
+        entry_edit = Text(root_edit, width=40, height=4)
+        entry_edit.insert(END, current_text)
+        entry_edit.pack()
+        button_save = Button(root_edit, text="Save", command=save)
+        button_save.pack()
+        root_edit.mainloop()
+    else:
+        tkinter.messagebox.showwarning(title="Warning!", message="Please select a task to edit")
+
+def clearalltasks():
+    if tkinter.messagebox.askokcancel("Clear All", "Are you sure you want to clear all tasks?"):
+        listbox_task.delete(0, END)
+
+import pickle
+
+def savetasks():
+    tasks = listbox_task.get(0, END)
+    with open("tasks.pkl", "wb") as f:
+        pickle.dump(tasks, f)
+    tkinter.messagebox.showinfo("Save tasks", "Tasks saved successfully!")
+
+def loadtasks():
+    try:
+        with open("tasks.pkl", "rb") as f:
+            tasks = pickle.load(f)
+        listbox_task.delete(0, END)
+        for task in tasks:
+            listbox_task.insert(END, task)
+    except FileNotFoundError:
+        tkinter.messagebox.showwarning("Load tasks", "No saved tasks found.")
+
+def movetaskup():
+    selected = listbox_task.curselection()
+    if selected:
+        index = selected[0]
+        if index > 0:
+            text = listbox_task.get(index)
+            listbox_task.delete(index)
+            listbox_task.insert(index - 1, text)
+            listbox_task.select_set(index - 1)
+    else:
+        tkinter.messagebox.showwarning(title="Warning!", message="Please select a task to move")
+
+def movetaskdown():
+    selected = listbox_task.curselection()
+    if selected:
+        index = selected[0]
+        if index < listbox_task.size() - 1:
+            text = listbox_task.get(index)
+            listbox_task.delete(index)
+            listbox_task.insert(index + 1, text)
+            listbox_task.select_set(index + 1)
+    else:
+        tkinter.messagebox.showwarning(title="Warning!", message="Please select a task to move")
+
+# def searchtask():
+#     search_term = entry_search.get(1.0, "end-1c")
+#     listbox_task.selection_clear(0, END)
+#     for i in range(listbox_task.size()):
+#         if search_term.lower() in listbox_task.get(i).lower():
+#             listbox_task.selection_set(i)
+
+
 #creating the initial window
 window=Tk()
 #giving a title
-window.title("DataFlair To_Do_APP")
+window.title("TASK TRACKER")
 
 
 #Frame widget to hold the listbox and the scrollbar
@@ -72,9 +146,26 @@ entry_button.pack(pady=3)
 delete_button=Button(window,text="Delete selected task",width=50,command=deletetask)
 delete_button.pack(pady=3)
 
-mark_button=Button(window,text="Mark as completed ",width=50,command=markcompleted)
+mark_button=Button(window,text="Mark as completed",width=50,command=markcompleted)
 mark_button.pack(pady=3)
 
+mark_button=Button(window,text="edittask",width=50,command=edittask)
+mark_button.pack(pady=3)
+
+mark_button=Button(window,text="clearalltasks",width=50,command=clearalltasks)
+mark_button.pack(pady=3)
+
+mark_button=Button(window,text="savetasks",width=50,command=savetasks)
+mark_button.pack(pady=3)
+
+mark_button=Button(window,text="loadtasks",width=50,command=loadtasks)
+mark_button.pack(pady=3)
+
+mark_button=Button(window,text="movetaskup",width=50,command=movetaskup)
+mark_button.pack(pady=3)
+
+mark_button=Button(window,text="movetaskdown",width=50,command=movetaskdown)
+mark_button.pack(pady=3)
 
 window.mainloop()
 
